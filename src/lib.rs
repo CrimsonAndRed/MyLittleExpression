@@ -5,7 +5,7 @@ mod parser;
 use std::collections::VecDeque;
 
 use config::ParserConfig;
-use parser::YardToken;
+use parser::RPNToken;
 
 impl ParserConfig {
     pub fn parse(&self, formula: &str) -> i64 {
@@ -17,8 +17,8 @@ impl ParserConfig {
         for token in yard.iter() {
             println!("{:?}", token);
             match token {
-                YardToken::Number(num) => rpn.push_back(*num),
-                YardToken::Operator(op) => {
+                RPNToken::Number(num) => rpn.push_back(*num),
+                RPNToken::Operator(op) => {
                     let arg2 =  rpn.pop_back().unwrap();
                     let arg1 = rpn.pop_back().unwrap();
                     rpn.push_back(
