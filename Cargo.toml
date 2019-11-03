@@ -1,0 +1,12 @@
+[package]
+name = "expression_parser"
+version = "0.1.0"
+authors = ["Danone <crimsonandred@mail.ru>"]
+edition = "2018"
+
+[lib]
+name = "expression_parser"
+path = "src/lib.rs"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
