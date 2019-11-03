@@ -23,7 +23,7 @@ impl ParserConfig {
                     let arg2 =  rpn.pop_back().unwrap();
                     let arg1 = rpn.pop_back().unwrap();
                     rpn.push_back(
-                        self.applyBinaryOperator(op.chars().next().unwrap(), arg1, arg2)
+                        self.apply_binary_operator(op.chars().next().unwrap(), arg1, arg2)
                     );
                 },
             }
@@ -34,7 +34,7 @@ impl ParserConfig {
         res
     }
 
-    fn applyBinaryOperator(&self, op: char, arg1: i64, arg2: i64) -> i64 {
+    fn apply_binary_operator(&self, op: char, arg1: i64, arg2: i64) -> i64 {
         match op {
             '+' => arg1 + arg2,
             '-' => arg1 - arg2,
