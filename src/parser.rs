@@ -3,10 +3,10 @@ use crate::config::ParserConfig;
 use crate::Operator;
 use crate::ExprError;
 
-impl ParserConfig {
-    pub(crate) fn yard_from_str(&self, formula: &str) -> Result<VecDeque<RPNToken>, ExprError> {
+impl ParserConfig<i64> {
+    pub(crate) fn yard_from_str(&self, formula: &str) -> Result<VecDeque<RPNToken<i64>>, ExprError> {
         let mut yard = VecDeque::new();
-        let mut operators: VecDeque<YardToken> = VecDeque::new();
+        let mut operators: VecDeque<YardToken<i64>> = VecDeque::new();
 
         let mut num = String::new();
         let mut state = ParserState::NotInNumber;
@@ -94,9 +94,9 @@ impl ParserConfig {
 }
 
 #[derive(Debug)]
-pub(crate) enum RPNToken<'a> {
+pub(crate) enum RPNToken<'a, T> {
     Number(i64),
-    Operator(&'a Operator),
+    Operator(&'a Operator<T>),
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -105,7 +105,7 @@ pub(crate) enum ParserState {
     NotInNumber,
 }
 
-pub(crate) enum YardToken<'a> {
+pub(crate) enum YardToken<'a, T> {
     OpenBracket,
-    Operator(&'a Operator),
+    Operator(&'a Operator<T>),
 }
