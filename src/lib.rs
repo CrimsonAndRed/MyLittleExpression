@@ -8,19 +8,18 @@ use config::ParserConfig;
 use parser::RPNToken;
 
 impl ParserConfig {
-    pub fn parse(&self, formula: &str) -> i64 {
+    pub fn parse(&self, formula: &str) -> Result<i64, ExprError> {
 
-        let yard = self.yard_from_str(formula);
+        let yard = self.yard_from_str(formula)?;
 
         let mut rpn: VecDeque<i64> = VecDeque::new();
 
         for token in yard.iter() {
-            println!("{:?}", token);
             match token {
                 RPNToken::Number(num) => rpn.push_back(*num),
                 RPNToken::Operator(op) => {
-                    let arg2 =  rpn.pop_back().unwrap();
-                    let arg1 = rpn.pop_back().unwrap();
+                    let arg2 = rpn.pop_back().ok_or_else(|| ExprError::IncorrectToken(format!("Not enough arguments for operator {}", op.symbol)))?;
+                    let arg1 = rpn.pop_back().ok_or_else(|| ExprError::IncorrectToken(format!("Not enough arguments for operator {}", op.symbol)))?;
                     rpn.push_back(
                         (op.operation)(arg1, arg2)
                     );
@@ -30,7 +29,7 @@ impl ParserConfig {
 
         let res = rpn.pop_back().unwrap();
         assert!(rpn.is_empty());
-        res
+        Ok(res)
     }
 }
 
@@ -52,3 +51,21 @@ impl Operator {
         }
     }
 }
+
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum ExprError {
+    IncorrectToken(String),
+    ArithmeticsException(String),
+}
+
+impl std::fmt::Display for ExprError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            ExprError::IncorrectToken(s) => write!(f, "Incorrect token: {}", s),
+            ExprError::ArithmeticsException(s) => write!(f, "Arithmetics failed at {}", s),
+        }
+    }
+}
+
+impl std::error::Error for ExprError {}
