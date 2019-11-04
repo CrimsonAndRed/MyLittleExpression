@@ -56,7 +56,7 @@ impl <T> Operator<T> {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum ExprError {
-    IncorrectToken(String),
+    IncorrectToken(String, usize),
     ArithmeticsException(String),
     Unexpected(String),
 }
@@ -64,7 +64,7 @@ pub enum ExprError {
 impl std::fmt::Display for ExprError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            ExprError::IncorrectToken(s) => write!(f, "Incorrect token: {}", &s),
+            ExprError::IncorrectToken(i, s) => write!(f, "Incorrect token: {} at index {}", &s, i),
             ExprError::ArithmeticsException(s) => write!(f, "Arithmetics failed at {}", &s),
             ExprError::Unexpected(s) => write!(f, "Unexpected error: {}.\n You'd better report it", &s)
         }
