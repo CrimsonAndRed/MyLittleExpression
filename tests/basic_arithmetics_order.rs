@@ -31,3 +31,21 @@ fn basic_order_5() {
     let num = setup::setup_basic_config().parse(&"6/2*3+1");
     assert_eq!(10i64, num);
 }
+
+#[test]
+fn power_order_1() {
+    let num = setup::setup_basic_config().parse(&"6/2*3^2");
+    assert_eq!(27i64, num);
+}
+
+#[test]
+fn power_order_2() {
+    let num = setup::setup_basic_config().parse(&"(3-2)^(2*2)");
+    assert_eq!(1i64, num);
+}
+
+#[test]
+fn power_order_3() {
+    let num = setup::setup_basic_config().parse(&"2*2^10/2");
+    assert_eq!(1024i64, num);
+}
