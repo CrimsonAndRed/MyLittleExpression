@@ -17,11 +17,14 @@ impl<T> Default for ParserConfig<T> {
 
 impl ParserConfig<i64> {
     pub fn with_basic_math(&mut self) {
-        let plus = Operator::new('+', true, |a, b| a + b, 100);
-        let minus = Operator::new('-', true, |a, b| a - b, 100);
-        let multiply = Operator::new('*', true, |a, b| a * b, 200);
-        let divide = Operator::new('/', true, |a, b| a / b, 200);
-        let power = Operator::new('^', false, |a, b| i64::pow(a, b as u32), 300);
+        let plus = Operator::new('+', true, |a, b| Ok(a + b), 100);
+        let minus = Operator::new('-', true, |a, b| Ok(a - b), 100);
+        let multiply = Operator::new('*', true, |a, b| Ok(a * b), 200);
+        let divide = Operator::new('/', true, |a, b| Ok(a / b), 200);
+        let power = Operator::new('^', false, |a, b| {
+            // TODO https://docs.rs/num-traits/0.2.5/src/num_traits/cast.rs.html#197-204
+            Ok(i64::pow(a, b as u32))
+        }, 300);
 
         self.operators.insert(plus.symbol, plus);
         self.operators.insert(minus.symbol, minus);

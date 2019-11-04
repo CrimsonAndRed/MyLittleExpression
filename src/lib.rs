@@ -21,7 +21,7 @@ impl ParserConfig<i64> {
                     let arg2 = rpn.pop_back().ok_or_else(|| ExprError::Unexpected(format!("Not enough arguments for operator {}", op.symbol)))?;
                     let arg1 = rpn.pop_back().ok_or_else(|| ExprError::Unexpected(format!("Not enough arguments for operator {}", op.symbol)))?;
                     rpn.push_back(
-                        (op.operation)(arg1, arg2)
+                        (op.operation)(arg1, arg2).map_err(|e| ExprError::ArithmeticsException(format!("Error during computation {} over arguments {} and {}: {}", &op.symbol, &arg1, &arg2, &e)))?
                     );
                 },
             }
@@ -31,7 +31,6 @@ impl ParserConfig<i64> {
         if !rpn.is_empty() {
             return Err(ExprError::Unexpected(format!("Processed until solution but there was {} more items in RPN queue", rpn.len())));
         }
-        debug_assert!(rpn.is_empty());
         Ok(res)
     }
 }
@@ -40,12 +39,12 @@ impl ParserConfig<i64> {
 pub struct Operator<T> {
     pub(crate) symbol: char,
     pub(crate) left_associative: bool,
-    pub(crate) operation: fn(T, T) -> T,
+    pub(crate) operation: fn(T, T) -> Result<T, String>,
     pub(crate) order: u64
 }
 
 impl <T> Operator<T> {
-    pub fn new(symbol: char, left_associative: bool, operation: fn(T, T) -> T, order: u64) -> Self {
+    pub fn new(symbol: char, left_associative: bool, operation: fn(T, T) -> Result<T, String>, order: u64) -> Self {
         Operator {
             symbol,
             left_associative,
