@@ -43,3 +43,22 @@ fn basic_nospace() {
     let num = setup::setup_basic_config().parse(&"2+8-5");
     assert_eq!(5i64, num);
 }
+
+#[test]
+fn basic_power() {
+    let num = setup::setup_basic_config().parse(&"2^5");
+    assert_eq!(32i64, num);
+}
+
+
+#[test]
+fn basic_power_2() {
+    let num = setup::setup_basic_config().parse(&"2^0");
+    assert_eq!(1i64, num);
+}
+
+#[test]
+fn basic_power_3() {
+    let num = setup::setup_basic_config().parse(&"2^10");
+    assert_eq!(1024i64, num);
+}

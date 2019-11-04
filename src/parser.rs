@@ -2,6 +2,7 @@ use std::collections::VecDeque;
 use crate::config::ParserConfig;
 use crate::Operator;
 
+
 impl ParserConfig {
     pub(crate) fn yard_from_str(&self, formula: &str) -> VecDeque<RPNToken> {
         let mut yard = VecDeque::new();
