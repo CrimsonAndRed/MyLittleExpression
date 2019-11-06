@@ -62,3 +62,10 @@ fn basic_power_3() {
     let num = setup::setup_basic_config().parse(&"2^10");
     assert_eq!(Ok(1024i64), num);
 }
+
+#[test]
+fn basic_single_num() {
+    let num = setup::setup_basic_config().parse(&"20");
+    assert_eq!(Ok(20i64), num);
+}
+
