@@ -1,14 +1,16 @@
 pub mod config;
 
 mod parser;
+mod error;
 
 use std::collections::VecDeque;
+use error::ExprError;
 
 use config::ParserConfig;
 use parser::RPNToken;
 
-impl ParserConfig<i64> {
-    pub fn parse(&self, formula: &str) -> Result<i64, ExprError> {
+impl<'a> ParserConfig<i64> {
+    pub fn parse(&self, formula: &'a str) -> Result<i64, ExprError<'a>> {
 
         let yard = self.yard_from_str(formula)?;
 
@@ -21,7 +23,7 @@ impl ParserConfig<i64> {
                     let arg2 = rpn.pop_back().ok_or_else(|| ExprError::Unexpected(format!("Not enough arguments for operator {}", op.symbol)))?;
                     let arg1 = rpn.pop_back().ok_or_else(|| ExprError::Unexpected(format!("Not enough arguments for operator {}", op.symbol)))?;
                     rpn.push_back(
-                        (op.operation)(arg1, arg2).map_err(|e| ExprError::ArithmeticsException(format!("Error during computation {} over arguments {} and {}: {}", &op.symbol, &arg1, &arg2, &e)))?
+                        (op.operation)(arg1, arg2).map_err(|e| ExprError::ArithmeticException(format!("Error during computation {} over arguments {} and {}:\n{}", &op.symbol, &arg1, &arg2, &e)))?
                     );
                 },
             }
@@ -53,22 +55,3 @@ impl <T> Operator<T> {
         }
     }
 }
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum ExprError {
-    IncorrectToken(String, usize),
-    ArithmeticsException(String),
-    Unexpected(String),
-}
-
-impl std::fmt::Display for ExprError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            ExprError::IncorrectToken(i, s) => write!(f, "Incorrect token: {} at index {}", &s, i),
-            ExprError::ArithmeticsException(s) => write!(f, "Arithmetics failed at {}", &s),
-            ExprError::Unexpected(s) => write!(f, "Unexpected error: {}.\n You'd better report it", &s)
-        }
-    }
-}
-
-impl std::error::Error for ExprError {}
