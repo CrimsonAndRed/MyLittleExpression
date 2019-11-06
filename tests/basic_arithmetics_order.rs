@@ -49,3 +49,8 @@ fn power_order_3() {
     let num = setup::setup_basic_config().parse(&"2*2^10/2");
     assert_eq!(Ok(1024i64), num);
 }
+
+fn power_associativity() {
+    let num = setup::setup_basic_config().parse(&"2^3^2");
+    assert_eq!(Ok(512i64), num);
+}
