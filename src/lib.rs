@@ -18,7 +18,7 @@ impl<'a, T> ParserConfig<T> where T: Operand {
 
         for token in yard.drain(..) {
             match token {
-                RPNToken::Number(num) => rpn.push_back(num),
+                RPNToken::Operand(num) => rpn.push_back(num),
                 RPNToken::Operator(op) => {
                     let arg2 = rpn.pop_back().ok_or_else(|| ExprError::Unexpected(format!("Not enough arguments for operator {}", op.symbol)))?;
                     let arg1 = rpn.pop_back().ok_or_else(|| ExprError::Unexpected(format!("Not enough arguments for operator {}", op.symbol)))?;
@@ -56,12 +56,22 @@ impl <T> Operator<T> where T: Operand {
     }
 }
 
-// TODO should not be sized
+// TODO should not be sized, but how should i return Self? Box<i64>?
 pub trait Operand: std::fmt::Display + Sized {
+    type Context: Default;
+
+    fn is_operand_partial(context: &mut Self::Context, ch: char) -> bool;
     fn from_str(from: &str) -> Result<Self, ()>;
 }
 
 impl Operand for i64 {
+
+    type Context = ();
+
+    fn is_operand_partial(_context: &mut Self::Context, ch: char) -> bool {
+        ch.is_digit(10)
+    }
+
     fn from_str(from: &str) -> Result<i64, ()> {
         i64::from_str_radix(&from, 10).map_err(|_| {})
     }
