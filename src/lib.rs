@@ -9,21 +9,22 @@ use error::ExprError;
 use config::ParserConfig;
 use parser::RPNToken;
 
-impl<'a> ParserConfig<i64> {
-    pub fn parse(&self, formula: &'a str) -> Result<i64, ExprError<'a>> {
+impl<'a, T> ParserConfig<T> where T: Operand {
+    pub fn parse(&self, formula: &'a str) -> Result<T, ExprError<'a>> {
 
-        let yard = self.yard_from_str(formula)?;
+        let mut yard = self.yard_from_str(formula)?;
 
-        let mut rpn: VecDeque<i64> = VecDeque::new();
+        let mut rpn: VecDeque<T> = VecDeque::new();
 
-        for token in yard.iter() {
+        for token in yard.drain(..) {
             match token {
-                RPNToken::Number(num) => rpn.push_back(*num),
+                RPNToken::Number(num) => rpn.push_back(num),
                 RPNToken::Operator(op) => {
                     let arg2 = rpn.pop_back().ok_or_else(|| ExprError::Unexpected(format!("Not enough arguments for operator {}", op.symbol)))?;
                     let arg1 = rpn.pop_back().ok_or_else(|| ExprError::Unexpected(format!("Not enough arguments for operator {}", op.symbol)))?;
+                    // Pass arguments by reference - is it ok?
                     rpn.push_back(
-                        (op.operation)(arg1, arg2).map_err(|e| ExprError::ArithmeticException(format!("Error during computation {} over arguments {} and {}:\n{}", &op.symbol, &arg1, &arg2, &e)))?
+                        (op.operation)(&arg1, &arg2).map_err(|e| ExprError::ArithmeticException(format!("Error during computation {} over arguments {} and {}:\n{}", &op.symbol, &arg1, &arg2, &e)))?
                     );
                 },
             }
@@ -37,21 +38,31 @@ impl<'a> ParserConfig<i64> {
     }
 }
 
-#[derive(Debug)]
-pub struct Operator<T> {
+pub struct Operator<T> where T: Operand {
     pub(crate) symbol: char,
     pub(crate) left_associative: bool,
-    pub(crate) operation: fn(T, T) -> Result<T, String>,
+    pub(crate) operation: fn(&T, &T) -> Result<T, String>,
     pub(crate) order: u64
 }
 
-impl <T> Operator<T> {
-    pub fn new(symbol: char, left_associative: bool, operation: fn(T, T) -> Result<T, String>, order: u64) -> Self {
+impl <T> Operator<T> where T: Operand {
+    pub fn new(symbol: char, left_associative: bool, operation: fn(&T, &T) -> Result<T, String>, order: u64) -> Self {
         Operator {
             symbol,
             left_associative,
             operation,
             order
         }
+    }
+}
+
+// TODO should not be sized
+pub trait Operand: std::fmt::Display + Sized {
+    fn from_str(from: &str) -> Result<Self, ()>;
+}
+
+impl Operand for i64 {
+    fn from_str(from: &str) -> Result<i64, ()> {
+        i64::from_str_radix(&from, 10).map_err(|_| {})
     }
 }

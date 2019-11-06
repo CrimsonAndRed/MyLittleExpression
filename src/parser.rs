@@ -1,12 +1,13 @@
 use std::collections::VecDeque;
 use crate::config::ParserConfig;
 use crate::Operator;
+use crate::Operand;
 use crate::ExprError;
 
-impl <'a> ParserConfig<i64> {
-    pub(crate) fn  yard_from_str(&self, formula: &'a str) -> Result<VecDeque<RPNToken<i64>>, ExprError<'a>> {
+impl <'a, T> ParserConfig<T> where T: Operand {
+    pub(crate) fn  yard_from_str(&self, formula: &'a str) -> Result<VecDeque<RPNToken<T>>, ExprError<'a>> {
         let mut yard = VecDeque::new();
-        let mut operators: VecDeque<YardToken<i64>> = VecDeque::new();
+        let mut operators: VecDeque<YardToken<T>> = VecDeque::new();
 
         let mut num = String::new();
         let mut state = ParserState::NotInNumber;
@@ -19,7 +20,7 @@ impl <'a> ParserConfig<i64> {
                 continue;
             } else if state == ParserState::InNumber {
 
-                let n = i64::from_str_radix(&num, 10).map_err(|_| ExprError::IncorrectToken("Failed to parse number at index".to_owned(), formula, i))?;
+                let n = T::from_str(&num).map_err(|_| ExprError::IncorrectToken("Failed to parse number at index".to_owned(), formula, i))?;
                 yard.push_back(RPNToken::Number(n));
                 num = String::new();
             }
@@ -76,7 +77,7 @@ impl <'a> ParserConfig<i64> {
 
         if !num.is_empty() {
             // TODO position in formula
-            let n = i64::from_str_radix(&num, 10).map_err(|_| ExprError::IncorrectToken(format!("Could not parse number {} ", &num), formula, formula.len() - 1))?;
+            let n = T::from_str(&num).map_err(|_| ExprError::IncorrectToken(format!("Could not parse number {} ", &num), formula, formula.len() - 1))?;
 
             yard.push_back(RPNToken::Number(n));
         }
@@ -96,9 +97,8 @@ impl <'a> ParserConfig<i64> {
     }
 }
 
-#[derive(Debug)]
-pub(crate) enum RPNToken<'a, T> {
-    Number(i64),
+pub(crate) enum RPNToken<'a, T> where T: Operand{
+    Number(T),
     Operator(&'a Operator<T>),
 }
 
@@ -108,7 +108,7 @@ pub(crate) enum ParserState {
     NotInNumber,
 }
 
-pub(crate) enum YardToken<'a, T> {
+pub(crate) enum YardToken<'a, T> where T: Operand{
     OpenBracket,
     Operator(&'a Operator<T>),
 }
