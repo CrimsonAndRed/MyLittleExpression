@@ -76,3 +76,27 @@ impl Operand for i64 {
         i64::from_str_radix(&from, 10).map_err(|_| {})
     }
 }
+
+impl Operand for f64 {
+
+    // had already parsed dot
+    type Context = bool;
+
+    fn is_operand_partial(context: &mut Self::Context, ch: char) -> bool {
+
+        if ch.is_digit(10) {
+            return true;
+        }
+
+        if ch == '.' && !*context {
+            *context = true;
+            return true;
+        }
+
+        false
+    }
+
+    fn from_str(from: &str) -> Result<f64, ()> {
+        from.parse::<f64>().map_err(|_| {})
+    }
+}
