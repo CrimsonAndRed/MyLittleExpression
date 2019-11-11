@@ -4,6 +4,36 @@ use crate::Operator;
 use crate::Operand;
 use crate::ExprError;
 
+
+impl<'a, T> ParserConfig<T> where T: Operand {
+    pub fn parse(&self, formula: &'a str) -> Result<T, ExprError<'a>> {
+
+        let mut yard = self.yard_from_str(formula)?;
+
+        let mut rpn: VecDeque<T> = VecDeque::new();
+
+        for token in yard.drain(..) {
+            match token {
+                RPNToken::Operand(num) => rpn.push_back(num),
+                RPNToken::Operator(op) => {
+                    let arg2 = rpn.pop_back().ok_or_else(|| ExprError::Unexpected(format!("Not enough arguments for operator {}", op.symbol)))?;
+                    let arg1 = rpn.pop_back().ok_or_else(|| ExprError::Unexpected(format!("Not enough arguments for operator {}", op.symbol)))?;
+                    // Pass arguments by reference - is it ok?
+                    rpn.push_back(
+                        (op.operation)(&arg1, &arg2).map_err(|e| ExprError::ArithmeticException(format!("Error during computation {} over arguments {} and {}:\n{}", &op.symbol, &arg1, &arg2, &e)))?
+                    );
+                },
+            }
+        }
+
+        let res = rpn.pop_back().ok_or_else(|| ExprError::Unexpected("Could not get solution because RPN stack was too short".to_owned()))?;
+        if !rpn.is_empty() {
+            return Err(ExprError::Unexpected(format!("Processed until solution but there was {} more items in RPN queue", rpn.len())));
+        }
+        Ok(res)
+    }
+}
+
 impl<'a, T> ParserConfig<T> where T: Operand {
     pub(crate) fn yard_from_str(&self, formula: &'a str) -> Result<VecDeque<RPNToken<T>>, ExprError<'a>> {
         let mut yard = VecDeque::new();
