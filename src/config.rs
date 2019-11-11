@@ -6,6 +6,12 @@ pub struct ParserConfig<T> where T: Operand {
     pub(crate) operators: HashMap<char, Operator<T>>,
 }
 
+impl<T> ParserConfig<T> where T: Operand {
+    pub fn with_operator(&mut self, op: Operator<T>) {
+        self.operators.insert(op.symbol, op);
+    }
+}
+
 impl<T> Default for ParserConfig<T> where T: Operand {
     fn default() -> Self {
         let mut parser = ParserConfig {
@@ -30,7 +36,7 @@ impl ParserConfig<i64> {
             if *b > std::u32::MAX as i64 {
                 return Err(format!("Too big exponent: {} ^ {}", a, b));
             }
-            i64::checked_pow(*a, *b as u32).ok_or_else(|| format!("Exponent with overflow: {} ^ {}", a, b))
+            i64::checked_pow(*a, *b as u32).ok_or_else(|| format!("Power with overflow: {} ^ {}", a, b))
         }, 300);
 
         self.operators.insert(plus.symbol, plus);
@@ -58,5 +64,4 @@ impl ParserConfig<f64> {
         self.operators.insert(divide.symbol, divide);
         self.operators.insert(power.symbol, power);
     }
-
 }
