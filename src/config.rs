@@ -55,13 +55,3 @@ impl ParserConfig<f64> {
     }
 
 }
-
-pub struct ParserConfigBuilder {
-}
-
-impl Default for ParserConfigBuilder {
-    fn default() -> Self {
-        ParserConfigBuilder {
-        }
-    }
-}
