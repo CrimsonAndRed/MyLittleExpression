@@ -28,24 +28,30 @@ impl Display for Unary {
 impl Operand for Unary {
 
     // is zero
-    type Context = bool;
 
-    fn is_operand_partial(context: &mut Self::Context, ch: char) -> bool {
-        if *context {
-            return false;
+    fn parse_operand(from: &[char]) -> Option<(usize, Self)> {
+        let mut index = 0usize;
+        if from.is_empty() {
+            return None;
         }
-        if ch == '0' {
-            *context = true;
-            return true;
-        }
-        ch == '|'
-    }
 
-    fn from_str(from: &str) -> Result<Unary, ()> {
-        if from.len() == 1 && from.chars().next().unwrap() == '0' {
-            return Ok(Unary(0u64));
+        if from[0] == '0' {
+            return Some((1, Unary(0)));
+        }
+
+
+        while index < from.len() {
+            if from[index] == '|' {
+                index += 1;
+            } else {
+                break;
+            }
+        }
+
+        if index == 0 {
+            return None;
         } else {
-            return Ok(Unary(from.len() as u64))
+            return Some((index, Unary(index as u64)));
         }
     }
 }

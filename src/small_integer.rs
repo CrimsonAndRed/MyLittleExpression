@@ -10,7 +10,7 @@ impl ParserConfig<i64> {
         let divide = Operator::new('/', true, |a: &i64, b| a.checked_div(*b).ok_or_else(|| format!("Division with overflow: {} / {}", a, b)), 200);
         let power = Operator::new('^', false, |a: &i64, b| {
             if *b < 0 {
-                return Err(format!("Could not calculate negative exponent: {} ^ {}", a, b));
+                return Err(format!("Could not calculate negative exponent as integer: {} ^ {}", a, b));
             }
 
             if *b > std::u32::MAX as i64 {
@@ -28,14 +28,25 @@ impl ParserConfig<i64> {
 }
 
 impl Operand for i64 {
+    fn parse_operand(from: &[char]) -> Option<(usize, Self)> {
+        let mut index = 0usize;
+        let mut res = 0i64;
 
-    type Context = ();
+        while index < from.len() {
+            match from[index].to_digit(10) {
+                Some(digit) => {
+                    res = res * 10 + digit as i64;
+                    index += 1;
+                    continue;
+                },
+                None => break,
+            }
+        }
 
-    fn is_operand_partial(_context: &mut Self::Context, ch: char) -> bool {
-        ch.is_digit(10)
-    }
-
-    fn from_str(from: &str) -> Result<i64, ()> {
-        i64::from_str_radix(&from, 10).map_err(|_| {})
+        if index == 0 {
+            None
+        } else {
+            Some((index, res))
+        }
     }
 }

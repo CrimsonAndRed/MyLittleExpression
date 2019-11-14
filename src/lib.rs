@@ -5,11 +5,9 @@ mod error;
 mod small_integer;
 mod small_float;
 
-use std::collections::VecDeque;
 use error::ExprError;
 
 use config::ParserConfig;
-use parser::RPNToken;
 
 pub struct Operator<T> where T: Operand {
     pub(crate) symbol: char,
@@ -31,8 +29,5 @@ impl <T> Operator<T> where T: Operand {
 
 // TODO should not be sized, but how should i return Self? Box<i64>?
 pub trait Operand: std::fmt::Display + Sized {
-    type Context: Default;
-
-    fn is_operand_partial(context: &mut Self::Context, ch: char) -> bool;
-    fn from_str(from: &str) -> Result<Self, ()>;
+    fn parse_operand(from: &[char]) -> Option<(usize, Self)>;
 }

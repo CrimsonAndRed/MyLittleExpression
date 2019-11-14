@@ -21,25 +21,34 @@ impl ParserConfig<f64> {
 }
 
 impl Operand for f64 {
+    fn parse_operand(from: &[char]) -> Option<(usize, Self)> {
+        let mut index = 0usize;
+        let mut has_dot = false;
 
-    // had already parsed dot
-    type Context = bool;
-
-    fn is_operand_partial(context: &mut Self::Context, ch: char) -> bool {
-
-        if ch.is_digit(10) {
-            return true;
+        while index < from.len() {
+            match from[index] {
+                ch if ch.is_digit(10) => {
+                    index += 1;
+                    continue;
+                },
+                '.' if has_dot => {
+                    break
+                },
+                '.' if !has_dot => {
+                    has_dot = true;
+                    index+=1;
+                    continue;
+                },
+                _ => break
+            }
         }
 
-        if ch == '.' && !*context {
-            *context = true;
-            return true;
+        if index == 0 {
+            return None;
         }
 
-        false
-    }
 
-    fn from_str(from: &str) -> Result<f64, ()> {
-        from.parse::<f64>().map_err(|_| {})
+        let parsed = from[..index].iter().collect::<String>().parse::<f64>();
+        parsed.ok().map(|p| (index, p))
     }
 }
