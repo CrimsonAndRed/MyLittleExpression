@@ -26,9 +26,6 @@ impl Display for Unary {
 
 // Unary numeric system: 0 is zero, ||||| is 5 etc..
 impl Operand for Unary {
-
-    // is zero
-
     fn parse_operand(from: &[char]) -> Option<(usize, Self)> {
         let mut index = 0usize;
         if from.is_empty() {

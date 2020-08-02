@@ -4,6 +4,7 @@ mod parser;
 mod error;
 mod small_integer;
 mod small_float;
+mod big_integer;
 
 use error::ExprError;
 

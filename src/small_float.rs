@@ -21,6 +21,7 @@ impl ParserConfig<f64> {
 }
 
 impl Operand for f64 {
+
     fn parse_operand(from: &[char]) -> Option<(usize, Self)> {
         let mut index = 0usize;
         let mut has_dot = false;
@@ -36,7 +37,7 @@ impl Operand for f64 {
                 },
                 '.' if !has_dot => {
                     has_dot = true;
-                    index+=1;
+                    index += 1;
                     continue;
                 },
                 _ => break

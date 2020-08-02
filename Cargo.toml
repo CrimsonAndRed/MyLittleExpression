@@ -9,4 +9,9 @@ name = "expression_parser"
 path = "src/lib.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = []
+bigint = ["num-bigint"]
+
 [dependencies]
+num-bigint = { version = "0.3.0", optional = true }

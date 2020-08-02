@@ -3,7 +3,7 @@ use crate::Operator;
 use crate::Operand;
 
 pub struct ParserConfig<T> where T: Operand {
-    pub(crate) operators: HashMap<char, Operator<T>>,
+    pub operators: HashMap<char, Operator<T>>,
 }
 
 impl<T> ParserConfig<T> where T: Operand {
