@@ -33,3 +33,10 @@ fn basic_div() {
     let num = setup::setup_big_int_config().parse(&"4 / 2");
     assert_eq!(Ok(BigInt::from_str("2").unwrap()), num);
 }
+
+#[test]
+#[cfg(feature = "bigint")]
+fn overflow_i64_add() {
+    let num = setup::setup_big_int_config().parse(&"9223372036854775807 * 2");
+    assert_eq!(Ok(BigInt::from_str("18446744073709551614").unwrap()), num);
+}

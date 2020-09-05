@@ -4,7 +4,8 @@ use crate::Operator;
 use crate::Operand;
 use crate::ExprError;
 
-impl<'a, T> ParserConfig<T> where T: Operand {
+// TODO should not be clone
+impl<'a, T> ParserConfig<T> where T: Operand, T: std::clone::Clone {
 
     fn parse_operator(&self, from: &[char]) -> Option<(usize, &Operator<T>)> {
         self.operators.get(&from[0]).map(|i| (1usize, i))
@@ -41,7 +42,6 @@ impl<'a, T> ParserConfig<T> where T: Operand {
         let mut yard = VecDeque::new();
         let mut operators: VecDeque<YardToken<T>> = VecDeque::new();
 
-        // No support for surrogate pairs
         let mut index = 0usize;
         let chars_origin = &formula.chars().collect::<Vec<char>>()[..];
         let bound = chars_origin.len();
@@ -74,7 +74,13 @@ impl<'a, T> ParserConfig<T> where T: Operand {
                 _ => {}
             }
 
-            let parsed_operand = T::parse_operand(&chars);
+            let variable = self.variables.get(&chars[0]);
+            let parsed_operand = if let Some(var) = variable {
+                Some((1, var.value.clone()))
+            } else {
+                T::parse_operand(&chars)
+            };
+
             let parsed_operator = self.parse_operator(&chars);
 
             // Should have match expression here, but it is hard

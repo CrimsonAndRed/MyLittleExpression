@@ -32,3 +32,17 @@ impl <T> Operator<T> where T: Operand {
 pub trait Operand: std::fmt::Display + Sized {
     fn parse_operand(from: &[char]) -> Option<(usize, Self)>;
 }
+
+pub struct Variable<T> where T: Operand {
+    pub(crate) symbol: char,
+    pub(crate) value: T,
+}
+
+impl <T> Variable<T> where T: Operand {
+    pub fn new(symbol: char, value: T) -> Self {
+        Variable {
+            symbol,
+            value,
+        }
+    }
+}

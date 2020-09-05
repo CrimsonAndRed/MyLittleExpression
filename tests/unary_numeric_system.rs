@@ -6,7 +6,7 @@ use std::fmt::Display;
 
 mod setup;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 struct Unary(u64);
 
 impl Display for Unary {
