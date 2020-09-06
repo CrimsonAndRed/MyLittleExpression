@@ -19,8 +19,6 @@ pub fn setup_floats_config() -> ParserConfig<f64> {
 use num_bigint::BigInt;
 #[cfg(feature = "bigint")]
 pub fn setup_big_int_config() -> ParserConfig<BigInt> {
-    use num_bigint::BigInt;
-
     let mut cfg = ParserConfig::<BigInt>::default();
     cfg.with_basic_math();
     cfg
