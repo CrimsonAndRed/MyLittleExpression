@@ -20,11 +20,9 @@ impl<T> ParserConfig<T> where T: Operand {
 
 impl<T> Default for ParserConfig<T> where T: Operand {
     fn default() -> Self {
-        let parser = ParserConfig {
+        ParserConfig {
             operators: HashMap::new(),
             variables: HashMap::new(),
-        };
-
-        parser
+        }
     }
 }

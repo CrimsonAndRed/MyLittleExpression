@@ -1,8 +1,9 @@
+#[cfg(feature = "bigint")]
 use crate::Operator;
+#[cfg(feature = "bigint")]
 use crate::Operand;
+#[cfg(feature = "bigint")]
 use crate::ParserConfig;
-
-
 #[cfg(feature = "bigint")]
 use num_bigint::BigInt;
 #[cfg(feature = "bigint")]

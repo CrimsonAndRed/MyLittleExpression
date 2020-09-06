@@ -22,7 +22,7 @@ fn prettify_formula_error(text: &str, formula: &str, position: usize) -> String 
     let s = "Error during formula parsing: ";
 
     let times_before = position;
-    let times_after = if formula.len() == 0 { 0 } else { formula.len() - 1 - position };
+    let times_after = if formula.is_empty() { 0 } else { formula.len() - 1 - position };
     let mut underline: String = String::with_capacity(formula.len() + s.len());
     for _ in 0..s.len() {
         underline.push(' ');
