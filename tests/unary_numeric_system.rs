@@ -1,10 +1,10 @@
 extern crate expression_parser;
 
+mod setup;
+
 use expression_parser::{Operator, Operand};
 use expression_parser::config::ParserConfig;
 use std::fmt::Display;
-
-mod setup;
 
 #[derive(Debug, PartialEq, Clone)]
 struct Unary(u64);

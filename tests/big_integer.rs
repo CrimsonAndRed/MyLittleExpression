@@ -1,8 +1,11 @@
 extern crate expression_parser;
+
+mod setup;
+
 #[cfg(feature = "bigint")]
 use num_bigint::BigInt;
 
-mod setup;
+#[cfg(feature = "bigint")]
 use std::str::FromStr;
 
 #[test]

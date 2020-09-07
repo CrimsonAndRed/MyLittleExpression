@@ -1,6 +1,7 @@
 extern crate expression_parser;
 
 mod setup;
+
 use expression_parser::Variable;
 
 #[test]

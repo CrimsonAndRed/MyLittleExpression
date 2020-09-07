@@ -31,7 +31,7 @@ impl Operand for BigInt {
 
         while index < from.len() {
             match from[index].to_digit(10) {
-                Some(digit) => {
+                Some(_digit) => {
                     index += 1;
                     continue;
                 },
