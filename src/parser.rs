@@ -3,6 +3,7 @@ use crate::config::ParserConfig;
 use crate::Operator;
 use crate::Operand;
 use crate::ExprError;
+use std::cmp::Ordering;
 
 // TODO should not be clone
 impl<'a, T> ParserConfig<T> where T: Operand, T: std::clone::Clone {
@@ -83,50 +84,29 @@ impl<'a, T> ParserConfig<T> where T: Operand, T: std::clone::Clone {
 
             let parsed_operator = self.parse_operator(&chars);
 
-            // Should have match expression here, but it is hard
-            if parsed_operand.is_some() &&
-                (parsed_operator.is_none() || parsed_operator.as_ref().unwrap().0 > parsed_operator.as_ref().unwrap().0) {
-                let (i, operand) = parsed_operand.unwrap();
-                yard.push_back(RPNToken::Operand(operand));
-                index += i;
-                continue;
-            }
-
-            if parsed_operator.is_some() &&
-                (parsed_operand.is_none() || parsed_operator.as_ref().unwrap().0 > parsed_operand.as_ref().unwrap().0) {
-
-                let (j, operator) = parsed_operator.unwrap();
-                loop {
-                    let last_operator = operators.back();
-                    if last_operator.is_none() {
-                        break;
-                    }
-                    // Safe unwrap
-                    if let YardToken::Operator(last_operator, _) = last_operator.unwrap() {
-                        if last_operator.order > operator.order
-                            ||
-                            last_operator.left_associative && last_operator.order == operator.order {
-                            // And safe unwrap here again
-                            if let YardToken::Operator(op, _) = operators.pop_back().unwrap() {
-                                yard.push_back(RPNToken::Operator(op));
-                            }
-                        } else {
-                            break;
+            match (parsed_operand, parsed_operator) {
+                (Some(operand), None) => {
+                    self.push_operand(&mut yard, operand.1, operand.0, &mut index);
+                }
+                (None, Some(operator)) => {
+                    self.push_operator(&mut yard, &mut operators, operator.1, operator.0, &mut index)
+                }
+                (None, None) => {
+                    return Err(ExprError::IncorrectToken("No matching operand or operator".to_owned(), formula, index));
+                }
+                (Some(operand), Some(operator)) => {
+                    match operator.0.cmp(&operand.0) {
+                        Ordering::Equal => {
+                            return Err(ExprError::IncorrectToken(format!("Could not determine if following expression is operator {} or operand {}", operator.1.symbol, operand.1), formula, index));
                         }
-                    } else {
-                        break;
+                        Ordering::Greater => {
+                            self.push_operator(&mut yard, &mut operators, operator.1, operator.0, &mut index)
+                        }
+                        Ordering::Less => {
+                            self.push_operand(&mut yard, operand.1, operand.0, &mut index);
+                        }
                     }
                 }
-                operators.push_back(YardToken::Operator(operator, j));
-                index += j;
-                continue;
-            }
-
-
-            if parsed_operator.is_some() && parsed_operand.is_some() {
-                return Err(ExprError::IncorrectToken(format!("Could not determine if following expression is operator {} or operand {}", parsed_operator.unwrap().1.symbol, parsed_operand.unwrap().1), formula, index));
-            } else {
-                return Err(ExprError::IncorrectToken("No matching operand or operator".to_owned(), formula, index));
             }
         }
 
@@ -141,6 +121,37 @@ impl<'a, T> ParserConfig<T> where T: Operand, T: std::clone::Clone {
         };
 
         Ok(yard)
+    }
+
+    fn push_operand(&self, yard: &mut VecDeque<RPNToken<T>>, operand: T, current_index: usize, index: &mut usize) {
+        yard.push_back(RPNToken::Operand(operand));
+        *index += current_index;
+    }
+
+    fn push_operator<'b>(&self, yard: &mut VecDeque<RPNToken<'b, T>>, operators: &mut VecDeque<YardToken<'b, T>>, operator: &'b Operator<T>, current_index: usize, index: &mut usize) {
+        loop {
+            let last_operator = operators.back();
+            if last_operator.is_none() {
+                break;
+            }
+            // Safe unwrap
+            if let YardToken::Operator(last_operator, _) = last_operator.unwrap() {
+                if last_operator.order > operator.order
+                    ||
+                    last_operator.left_associative && last_operator.order == operator.order {
+                    // And safe unwrap here again
+                    if let YardToken::Operator(op, _) = operators.pop_back().unwrap() {
+                        yard.push_back(RPNToken::Operator(op));
+                    }
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+        operators.push_back(YardToken::Operator(operator, current_index));
+        *index += current_index;
     }
 }
 
