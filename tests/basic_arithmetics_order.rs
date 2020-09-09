@@ -1,6 +1,6 @@
 extern crate expression_parser;
 
-mod setup;
+pub mod setup;
 
 #[test]
 fn basic_order_1() {

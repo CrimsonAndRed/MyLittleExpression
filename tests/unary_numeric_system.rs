@@ -1,6 +1,6 @@
 extern crate expression_parser;
 
-mod setup;
+pub mod setup;
 
 use expression_parser::{Operator, Operand};
 use expression_parser::config::ParserConfig;

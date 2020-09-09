@@ -1,6 +1,6 @@
 extern crate expression_parser;
 
-mod setup;
+pub mod setup;
 
 #[cfg(feature = "bigint")]
 use num_bigint::BigInt;
