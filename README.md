@@ -6,4 +6,3 @@ It may be used to solve expressions in different notaitons, even not usual ones 
 ## TODO
 - Integer division is not assosiative
 - variables as strings
-- clippy
