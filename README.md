@@ -1,9 +1,9 @@
-## Simple Expression Solver
+# Simple Expression Solver
 
 This small project is capable of solving simple formulas!
 It may be used to solve expressions in different notaitons, even not usual ones (see [this](tests/unary_numeric_system.rs) example).
 
-# Usage
+## Usage
 Add the following line to Cargo.toml file:
 ```
 expression_parser = { git = "https://github.com/CrimsonAndRed/MyLittleExpression" }
