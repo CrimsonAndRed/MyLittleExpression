@@ -100,7 +100,7 @@ impl<'a, T> ParserConfig<T> where T: Operand, T: std::clone::Clone {
                             return Err(ExprError::IncorrectToken(format!("Could not determine if following expression is operator {} or operand {}", operator.1.symbol, operand.1), formula, index));
                         }
                         Ordering::Greater => {
-                            self.push_operator(&mut yard, &mut operators, operator.1, operator.0, &mut index)
+                            self.push_operator(&mut yard, &mut operators, operator.1, operator.0, &mut index);
                         }
                         Ordering::Less => {
                             self.push_operand(&mut yard, operand.1, operand.0, &mut index);
@@ -130,12 +130,7 @@ impl<'a, T> ParserConfig<T> where T: Operand, T: std::clone::Clone {
 
     fn push_operator<'b>(&self, yard: &mut VecDeque<RPNToken<'b, T>>, operators: &mut VecDeque<YardToken<'b, T>>, operator: &'b Operator<T>, current_index: usize, index: &mut usize) {
         loop {
-            let last_operator = operators.back();
-            if last_operator.is_none() {
-                break;
-            }
-            // Safe unwrap
-            if let YardToken::Operator(last_operator, _) = last_operator.unwrap() {
+            if let Some(YardToken::Operator(last_operator, _)) = operators.back() {
                 if last_operator.order > operator.order
                     ||
                     last_operator.left_associative && last_operator.order == operator.order {

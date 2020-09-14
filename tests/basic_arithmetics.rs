@@ -68,4 +68,20 @@ fn basic_single_num() {
     let num = setup::setup_basic_config().parse(&"20");
     assert_eq!(Ok(20i64), num);
 }
+#[test]
+fn basic_integer_assosiative_1() {
+    let num = setup::setup_basic_config().parse(&"2 * 5 / 2");
+    assert_eq!(Ok(5i64), num);
+}
 
+#[test]
+fn basic_integer_assosiative_2() {
+    let num = setup::setup_basic_config().parse(&"20/5/2");
+    assert_eq!(Ok(2i64), num);
+}
+
+#[test]
+fn basic_integer_assosiative_3() {
+    let num = setup::setup_basic_config().parse(&"20/5*2");
+    assert_eq!(Ok(8i64), num);
+}
