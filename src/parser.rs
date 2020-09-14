@@ -129,17 +129,13 @@ impl<'a, T> ParserConfig<T> where T: Operand, T: std::clone::Clone {
     }
 
     fn push_operator<'b>(&self, yard: &mut VecDeque<RPNToken<'b, T>>, operators: &mut VecDeque<YardToken<'b, T>>, operator: &'b Operator<T>, current_index: usize, index: &mut usize) {
-        loop {
-            if let Some(YardToken::Operator(last_operator, _)) = operators.back() {
-                if last_operator.order > operator.order
-                    ||
-                    last_operator.left_associative && last_operator.order == operator.order {
-                    // And safe unwrap here again
-                    if let YardToken::Operator(op, _) = operators.pop_back().unwrap() {
-                        yard.push_back(RPNToken::Operator(op));
-                    }
-                } else {
-                    break;
+        while let Some(YardToken::Operator(last_operator, _)) = operators.back() {
+            if last_operator.order > operator.order
+                ||
+                last_operator.left_associative && last_operator.order == operator.order {
+                // And safe unwrap here again
+                if let YardToken::Operator(op, _) = operators.pop_back().unwrap() {
+                    yard.push_back(RPNToken::Operator(op));
                 }
             } else {
                 break;
